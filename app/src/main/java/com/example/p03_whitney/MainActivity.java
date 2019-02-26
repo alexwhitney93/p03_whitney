@@ -16,6 +16,8 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
+    AsteroidView asteroidView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -27,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
     class AsteroidView extends SurfaceView implements Runnable
     {
-        Thread gamethread = null;
+        Thread gameThread = null;
         SurfaceHolder ourHolder;
         volatile boolean playing;
         boolean paused = true;
@@ -37,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         int posx, posy;
         int dx, dy;
         int height, width;
-        boulder b[];
+        Boulder b[];
 
         private long thisTimeFrame;
 
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
             }
             posx += dx;
             posy += dy;
-            if((posx > width) || posx( < 0))
+            if((posx > width) || (posx < 0))
             {
                 dx = -dx;
             }
@@ -110,7 +112,75 @@ public class MainActivity extends AppCompatActivity {
 
         public void draw()
         {
-            
+            if(ourHolder.getSurface().isValid())
+            {
+                // lock the canvas ready to draw
+                canvas = ourHolder.lockCanvas();
+                width = canvas.getWidth();
+                height = canvas.getHeight();
+                // draw the background color
+                canvas.drawColor(Color.argb(255, 26, 128, 182));
+                // choose the brush color for drawing
+                paint.setColor(Color.argb(255, 255, 255, 255));
+                canvas.drawLine(0, 0, 300, y, paint);
+                // canvas.drawCircle(posx, posy, 301, paint);
+                for(int i = 0; i < 5; ++i)
+                {
+                    b[i].width = width;
+                    b[i].height = height;
+                    b[i].draw(canvas, paint);
+                }
+                // canvas.drawCircle(b.x, b.y, 50, paint);
+                ourHolder.unlockCanvasAndPost(canvas);
+            }
         }
+
+        public void pause()
+        {
+            playing = false;
+            try
+            {
+                gameThread.join();
+            }
+            catch (InterruptedException e)
+            {
+                Log.e("Error: ", "joining thread" );
+            }
+        }
+
+        public void resume()
+        {
+            playing = true;
+            gameThread = new Thread(this);
+            gameThread.start();
+        }
+
+        @Override
+        public boolean onTouchEvent(MotionEvent motionEvent)
+        {
+            if(motionEvent.getAction() == android.view.MotionEvent.ACTION_DOWN)
+            {
+                paused = !paused;
+            }
+            return true;
+        }
+    }
+
+    // This method executes when the player starts the game
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        // tell the gameView to resume method to execute
+        asteroidView.resume();
+    }
+
+    // This method executes when the player quits the game
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        // tell the gameView to resume method to execute
+        asteroidView.pause();
     }
 }
