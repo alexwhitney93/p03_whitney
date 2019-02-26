@@ -54,14 +54,14 @@ public class MainActivity extends AppCompatActivity {
         public void run()
         {
             Random r = new Random();
-            b = new boulder[5];
+            b = new Boulder[5];
             posx = 50;
             posy = 50;
             dx = 20;
             dy = 45;
             for(int i = 0; i < 5; ++i)
             {
-                b[i] = new boulder();
+                b[i] = new Boulder();
                 b[i].x = r.nextInt(50);
                 b[i].y = r.nextInt(50);
                 b[i].dx = r.nextInt(30) - 15;

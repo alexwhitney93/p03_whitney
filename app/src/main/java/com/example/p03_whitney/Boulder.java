@@ -12,6 +12,14 @@ public class Boulder
     {
         x += dx;
         y+= dy;
-        if(x < 0)
+        if(x < 0) dx = -dx;
+        if(y < 0) dy = -dy;
+        if(x > width) dx = -dx;
+        if(y > height) dy = -dy;
+    }
+
+    public void draw(Canvas canvas, Paint paint)
+    {
+        canvas.drawCircle(x, y, diameter, paint);
     }
 }
