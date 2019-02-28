@@ -1,169 +1,36 @@
 package com.example.p03_whitney;
 
 import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
 import android.os.Bundle;
-import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.graphics.Point;
+import android.view.Display;
+//import android.content.Context;
+//import android.graphics.Canvas;
+//import android.graphics.Color;
+//import android.graphics.Paint;
+//import android.os.Bundle;
+//import android.util.Log;
+//import android.view.MotionEvent;
+//import android.view.SurfaceHolder;
+//import android.view.SurfaceView;
 
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+{
 
-    AsteroidView asteroidView;
+    SnakeView snakeView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
-        asteroidView = new AsteroidView(this);
-        setContentView(asteroidView);
-    }
-
-    class AsteroidView extends SurfaceView implements Runnable
-    {
-        Thread gameThread = null;
-        SurfaceHolder ourHolder;
-        volatile boolean playing;
-        boolean paused = true;
-        Canvas canvas;
-        Paint paint;
-        int y;
-        int posx, posy;
-        int dx, dy;
-        int height, width;
-        Boulder b[];
-
-        private long thisTimeFrame;
-
-        public AsteroidView(Context context)
-        {
-            super(context);
-            ourHolder = getHolder();
-            paint = new Paint();
-        }
-
-        @Override
-        public void run()
-        {
-            Random r = new Random();
-            b = new Boulder[5];
-            posx = 50;
-            posy = 50;
-            dx = 20;
-            dy = 45;
-            for(int i = 0; i < 5; ++i)
-            {
-                b[i] = new Boulder();
-                b[i].x = r.nextInt(50);
-                b[i].y = r.nextInt(50);
-                b[i].dx = r.nextInt(30) - 15;
-                b[i].dy = r.nextInt(30) - 15;
-                b[i].diameter = 95;
-            }
-
-            while(playing)
-            {
-                if(!paused)
-                {
-                    update();
-                }
-                draw();
-                try
-                {
-                    Thread.sleep(50);
-                }
-                catch(InterruptedException e)
-                {
-
-                }
-            }
-        }
-
-        public void update()
-        {
-            y = y+5;
-            if(y > 200)
-            {
-                y = 5;
-            }
-            posx += dx;
-            posy += dy;
-            if((posx > width) || (posx < 0))
-            {
-                dx = -dx;
-            }
-            if((posy > height) || (posy < 0))
-            {
-                dy = -dy;
-            }
-            for(int i = 0; i < 5; ++i)
-            {
-                b[i].update();
-            }
-        }
-
-        public void draw()
-        {
-            if(ourHolder.getSurface().isValid())
-            {
-                // lock the canvas ready to draw
-                canvas = ourHolder.lockCanvas();
-                width = canvas.getWidth();
-                height = canvas.getHeight();
-                // draw the background color
-                canvas.drawColor(Color.argb(255, 26, 128, 182));
-                // choose the brush color for drawing
-                paint.setColor(Color.argb(255, 255, 255, 255));
-                canvas.drawLine(0, 0, 300, y, paint);
-                // canvas.drawCircle(posx, posy, 301, paint);
-                for(int i = 0; i < 5; ++i)
-                {
-                    b[i].width = width;
-                    b[i].height = height;
-                    b[i].draw(canvas, paint);
-                }
-                // canvas.drawCircle(b.x, b.y, 50, paint);
-                ourHolder.unlockCanvasAndPost(canvas);
-            }
-        }
-
-        public void pause()
-        {
-            playing = false;
-            try
-            {
-                gameThread.join();
-            }
-            catch (InterruptedException e)
-            {
-                Log.e("Error: ", "joining thread" );
-            }
-        }
-
-        public void resume()
-        {
-            playing = true;
-            gameThread = new Thread(this);
-            gameThread.start();
-        }
-
-        @Override
-        public boolean onTouchEvent(MotionEvent motionEvent)
-        {
-            if(motionEvent.getAction() == android.view.MotionEvent.ACTION_DOWN)
-            {
-                paused = !paused;
-            }
-            return true;
-        }
+        Display display = getWindowManager().getDefaultDisplay();       // get dimensions of screen
+        Point size = new Point();
+        display.getSize(size);                                          // load resolution into a Point object
+        snakeView = new SnakeView(this, size);                          // create a view based on snakeView class
+        setContentView(snakeView);                                      // set the snakeView as the current view
     }
 
     // This method executes when the player starts the game
@@ -171,8 +38,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume()
     {
         super.onResume();
-        // tell the gameView to resume method to execute
-        asteroidView.resume();
+        snakeView.resume();                                             // tell the gameView to resume method to execute
     }
 
     // This method executes when the player quits the game
@@ -180,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause()
     {
         super.onPause();
-        // tell the gameView to resume method to execute
-        asteroidView.pause();
+        snakeView.pause();                                              // tell the gameView to resume method to execute
     }
 }
