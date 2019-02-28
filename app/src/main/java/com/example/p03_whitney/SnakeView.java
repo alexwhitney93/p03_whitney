@@ -7,8 +7,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.media.AudioManager;
-import android.media.SoundPool;
+//import android.media.AudioManager;
+//import android.media.SoundPool;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -26,9 +26,14 @@ public class SnakeView extends SurfaceView implements Runnable
     private Paint paint;
     private Context context;
     //Sound
-    private SoundPool soundPool;
-    private int mouseSound = -1;
-    private int deathSound = -1;
+    //private SoundPool soundPool;
+    //private int mouseSound = -1;
+    //private int deathSound = -1;
+
+    //manifest
+    //android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+    //android:screenOrientation="landscape">
+
     private int[] snakeX, snakeY;
     private int snakeLength, score;
     private int mouseX, mouseY;
@@ -54,7 +59,7 @@ public class SnakeView extends SurfaceView implements Runnable
         width = p.x;
         blockSize = width/NUM_BLOCKS_WIDE;
         numBlocksHigh = height/blockSize;
-        //loadSound();
+        //  loadSound();
         startGame();
     }
 
@@ -80,7 +85,7 @@ public class SnakeView extends SurfaceView implements Runnable
         moveSnake();
         if(detectDeath())
         {
-            soundPool.play(deathSound, 1, 1, 0, 0, 1);
+            //soundPool.play(deathSound, 1, 1, 0, 0, 1);
             startGame();
         }
     }
@@ -90,10 +95,10 @@ public class SnakeView extends SurfaceView implements Runnable
         if(ourHolder.getSurface().isValid())
         {
             canvas = ourHolder.lockCanvas();
-            canvas.drawColor(Color.argb(255, 120, 197, 87));
+            canvas.drawColor(Color.argb(255, 0, 0, 205));
             paint.setColor(Color.argb(255, 255, 255, 255));
-            paint.setTextSize(30);
-            canvas.drawText("Score:" + score, 10, 30, paint);
+            paint.setTextSize(50);
+            canvas.drawText("Score:" + score, 10, 50, paint);
             // draw snake
             for(int i = 0; i < snakeLength; i++)
             {
@@ -151,7 +156,7 @@ public class SnakeView extends SurfaceView implements Runnable
         return false;
     }
 
-    public void loadSound()
+    /*public void loadSound()
     {
         soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
         try
@@ -167,7 +172,7 @@ public class SnakeView extends SurfaceView implements Runnable
         {
             Log.e("Error: ", "opening audio file" );
         }
-    }
+    }*/
 
     public void spawnMouse()
     {
@@ -181,7 +186,7 @@ public class SnakeView extends SurfaceView implements Runnable
         snakeLength++;
         spawnMouse();
         score++;
-        soundPool.play(mouseSound, 1, 1, 0, 0, 1);
+        //soundPool.play(mouseSound, 1, 1, 0, 0, 1);
     }
 
     private void moveSnake()

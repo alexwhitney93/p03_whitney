@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity
         Display display = getWindowManager().getDefaultDisplay();       // get dimensions of screen
         Point size = new Point();
         display.getSize(size);                                          // load resolution into a Point object
-        snakeView = new SnakeView(this, size);                          // create a view based on snakeView class
+        snakeView = new SnakeView(this, size);                       // create a view based on snakeView class
         setContentView(snakeView);                                      // set the snakeView as the current view
     }
 
