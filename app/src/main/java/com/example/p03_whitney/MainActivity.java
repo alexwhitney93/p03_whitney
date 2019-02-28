@@ -5,17 +5,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.graphics.Point;
 import android.view.Display;
-//import android.content.Context;
-//import android.graphics.Canvas;
-//import android.graphics.Color;
-//import android.graphics.Paint;
-//import android.os.Bundle;
-//import android.util.Log;
-//import android.view.MotionEvent;
-//import android.view.SurfaceHolder;
-//import android.view.SurfaceView;
-
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity
 {
