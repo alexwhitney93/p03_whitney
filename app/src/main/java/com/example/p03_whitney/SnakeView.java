@@ -33,7 +33,8 @@ public class SnakeView extends SurfaceView implements Runnable
     private int snakeLength, score;
     private int mouseX, mouseY;
     private int height, width;
-
+    public enum Direction {UP, LEFT, DOWN, RIGHT}
+    private Direction direction = Direction.RIGHT;      // snake faces right to start by default
     private long nextFrameTime;
     private final long FPS = 10;            // frames per second
     private final long MSPS = 1000;         // milliseconds per second
@@ -72,12 +73,42 @@ public class SnakeView extends SurfaceView implements Runnable
 
     public void update()
     {
-
+        if(snakeX[0] == mouseX && snakeY[0] == mouseY)
+        {
+            eatMouse();
+        }
+        moveSnake();
+        if(detectDeath())
+        {
+            soundPool.play(deathSound, 1, 1, 0, 0, 1);
+            startGame();
+        }
     }
 
     public void draw()
     {
-
+        if(ourHolder.getSurface().isValid())
+        {
+            canvas = ourHolder.lockCanvas();
+            canvas.drawColor(Color.argb(255, 120, 197, 87));
+            paint.setColor(Color.argb(255, 255, 255, 255));
+            paint.setTextSize(30);
+            canvas.drawText("Score:" + score, 10, 30, paint);
+            // draw snake
+            for(int i = 0; i < snakeLength; i++)
+            {
+                float sX = snakeX[i] * blockSize;
+                float sY = snakeY[i] * blockSize;
+                canvas.drawRect(sX, sY, sX + blockSize, sY + blockSize, paint);
+                //canvas.drawRect(snakeX[i] * blockSize, snakeY[i] * blockSize, (snakeX[i] * blockSize) + blockSize, (snakeY[i] * blockSize) + blockSize, paint);
+            }
+            // draw the mouse
+            float mX = mouseX * blockSize;
+            float mY = mouseY * blockSize;
+            canvas.drawRect(mX, mY, mX + blockSize, mY+ blockSize, paint);
+            //canvas.drawRect(mouseX * blockSize, mouseY * blockSize, (mouseX * blockSize) + blockSize, (mouseY * blockSize) + blockSize, paint);
+            ourHolder.unlockCanvasAndPost(canvas);
+        }
     }
 
     public void pause()
@@ -108,6 +139,16 @@ public class SnakeView extends SurfaceView implements Runnable
         score = 0;
         spawnMouse();                           // spawn a mouse in
         nextFrameTime = System.currentTimeMillis();     // nextFrameTime = now, so update is constantly triggered
+    }
+
+    public boolean checkForUpdate()
+    {
+        if(nextFrameTime <= System.currentTimeMillis())     // tenth of a second has passed
+        {
+            nextFrameTime = System.currentTimeMillis() + MSPS/FPS;  // update nextFrameTime
+            return true;
+        }
+        return false;
     }
 
     public void loadSound()
@@ -145,6 +186,90 @@ public class SnakeView extends SurfaceView implements Runnable
 
     private void moveSnake()
     {
-        
+        for(int i = snakeLength; i > 0; i--)
+        {
+            snakeX[i] = snakeX[i-1];                // update snake tail to head by moving each block
+            snakeY[i] = snakeY[i-1];                // to the position of the block in front of it
+        }
+        switch(direction)                           // then update the head based on which direction is selected
+        {
+            case UP:
+                snakeY[0]--;
+                break;
+            case LEFT:
+                snakeX[0]--;
+                break;
+            case DOWN:
+                snakeY[0]++;
+                break;
+            case RIGHT:
+                snakeX[0]++;
+                break;
+        }
+    }
+
+    private boolean detectDeath()
+    {
+        boolean dead = false;
+        // check to see if snake hit a wall
+        if(snakeX[0] == -1 ) dead = true;
+        if(snakeX[0] >= NUM_BLOCKS_WIDE) dead = true;
+        if(snakeY[0] == -1) dead = true;
+        if(snakeY[0] >= numBlocksHigh) dead = true;
+        // check to see if snake hit itself
+        for(int i = snakeLength-1; i > 0; i--)
+        {
+            if((i > 4) && (snakeX[0] == snakeX[i]) && (snakeY[0] == snakeY[i]))
+            {
+                dead = true;
+            }
+        }
+        return dead;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent motionEvent)
+    {
+        switch(motionEvent.getAction() & MotionEvent.ACTION_MASK)
+        {
+            case MotionEvent.ACTION_UP:
+                if (motionEvent.getX() >= width / 2)
+                {
+                    switch(direction)
+                    {
+                        case UP:
+                            direction = Direction.RIGHT;
+                            break;
+                        case RIGHT:
+                            direction = Direction.DOWN;
+                            break;
+                        case DOWN:
+                            direction = Direction.LEFT;
+                            break;
+                        case LEFT:
+                            direction = Direction.UP;
+                            break;
+                    }
+                }
+                else
+                {
+                    switch(direction)
+                    {
+                        case UP:
+                            direction = Direction.LEFT;
+                            break;
+                        case LEFT:
+                            direction = Direction.DOWN;
+                            break;
+                        case DOWN:
+                            direction = Direction.RIGHT;
+                            break;
+                        case RIGHT:
+                            direction = Direction.UP;
+                            break;
+                    }
+                }
+        }
+        return true;
     }
 }
